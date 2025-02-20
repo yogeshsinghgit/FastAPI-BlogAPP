@@ -1,0 +1,18 @@
+blog_app/
+├── user_management/       # User Management Microservice
+│   ├── app/              # FastAPI application
+│   │   ├── __init__.py
+│   │   ├── main.py       # FastAPI instance and endpoints
+│   │   ├── models.py     # Pydantic data models
+│   │   ├── routes.py     # API endpoints/routes
+│   │   ├── dependencies.py # Dependency injection
+│   │   └── config.py     # Configuration settings
+│   ├── tests/            # Unit and integration tests
+│   ├── Dockerfile        # Docker configuration
+│   └── README.md
+├── post_management/       # Post Management Microservice
+│   ├── ...
+├── comment_management/    # Comment Management Microservice
+│   ├── ...
+└── content_delivery/      # Content Delivery Microservice
+    ├── ...

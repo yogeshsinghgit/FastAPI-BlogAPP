@@ -1,0 +1,30 @@
+
+# MicroService Approach..
+
+BlogHub/
+│── services/
+│   ├── auth_service/
+│   │   ├── app/
+│   │   │   ├── routes/
+│   │   │   │   ├── auth.py
+│   │   │   │   ├── users.py
+│   │   │   ├── core/
+│   │   │   │   ├── security.py
+│   │   │   │   ├── config.py
+│   │   │   ├── db/
+│   │   │   ├── main.py
+│   │   ├── Dockerfile
+│   │   ├── requirements.txt
+│   ├── blog_service/
+│   │   ├── app/
+│   │   │   ├── routes/
+│   │   │   │   ├── blog.py
+│   │   │   │   ├── comments.py
+│   │   │   ├── db/
+│   │   │   ├── services/
+│   │   │   ├── main.py
+│   │   ├── Dockerfile
+│   │   ├── requirements.txt
+│── gateway/  # API Gateway (optional)
+│── docker-compose.yml  # Run everything together
+│── README.md
