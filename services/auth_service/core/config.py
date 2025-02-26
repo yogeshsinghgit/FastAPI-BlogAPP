@@ -2,8 +2,8 @@
 # It uses the pydantic_settings library to load the settings from environment variables or a .env file.
 
 import os
-from pydantic_settings import BaseSettings  
-from pydantic import Field
+from pydantic_settings import BaseSettings  # type: ignore
+from pydantic import Field # type: ignore
 
 class Settings(BaseSettings):
     # General settings
@@ -13,8 +13,8 @@ class Settings(BaseSettings):
     APP_DESCRIPTION: str = Field("A FastAPI application", env="APP_DESCRIPTION")
 
     # Database settings
-    DATABASE_URL: str = Field(..., env="DATABASE_URL")  # MongoDB connection string
-    DATABASE_NAME: str = Field("mydatabase", env="DATABASE_NAME")
+    DATABASE_URL: str = Field(..., env="DATABASE_URL")  # PostgresSQL connection string
+    # DATABASE_NAME: str = Field("mydatabase", env="DATABASE_NAME")
 
     # Google OAuth2 settings
     GOOGLE_CLIENT_ID: str = Field(..., env="GOOGLE_CLIENT_ID")

@@ -1,62 +1,38 @@
-from pydantic import BaseModel, EmailStr, Field 
-from typing import Optional, Literal
-from datetime import datetime, date
-from enum import Enum
+from sqlalchemy import Column, String, Boolean, DateTime, Enum as SQLAEnum, func
+from sqlalchemy.dialects.postgresql import UUID
+from db.database import Base
+import uuid, enum
 
+# class UserRole(Enum):
+#     ADMIN = "ADMIN"    # Full access
+#     USER = "USER"      # Can read/comment/like/dislike
+#     AUTHOR = "AUTHOR"  # Can write/edit/delete own blogs
+#     GUEST = "GUEST"    # Read-only access for a limited time
 
-# Enum for Gender
-class GenderEnum(str, Enum):
-    male = "male"
-    female = "female"
-    others = "others"
-
-
-class RoleEnum(str, Enum):
+class UserRole(str, enum.Enum):
     admin = "admin"
-    author = 'author'
-    reader = 'reader'
+    user = "user"
+    author = "author"
+    guest = "guest"
 
 
-# User Model
-## Stores user creation/registration information (email, username, password, is_active, etc.)
-class UserBase(BaseModel):
-    email: EmailStr
-    username: str
-    role: RoleEnum = RoleEnum.reader
-    is_active: bool = True
-    created_at: datetime = Field(default_factory=datetime.now)
+# Explicitly declare the ENUM type in PostgreSQL
+user_role_enum = SQLAEnum(UserRole, name="user_role_enum", create_type=True)
 
-    class Config:
-        orm_mode = True
+class User(Base):
+    __tablename__ = "users"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
+    name = Column(String, nullable=False)
+    email = Column(String, unique=True, nullable=False, index=True)
+    role = Column(user_role_enum, default=UserRole.guest, nullable=False)
+    password = Column(String, nullable=True)  # Now password can be NULL for OAuth users
+    is_oauth_user = Column(Boolean, default=False)  # Flag to check if user signed up with OAuth
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=func.now(), nullable=False)
 
+    def __repr__(self):
+        return f"<User(id={self.id}, name={self.name}, email={self.email}, is_oauth_user={self.is_oauth_user})>"
 
-class UserCreate(UserBase):
-    password: str
-
-
-
-class UserResponse(UserBase):
-    pass
-
-
-# User Profile Model
-## Stores user profile information (Bio, Profile Picture, etc.)
-class UserProfile(BaseModel):
-    user_id: str  # User ID
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    bio: Optional[str] = None
-    dob: Optional[date] = None
-    gender: Optional[GenderEnum] = None
-    profile_picture: Optional[str] = None
-
-    class Config:
-        orm_mode = True
-
-
-
-# Tokem Model/Schema
-class Token(BaseModel):
-    access_token: str
-    refresh_token: Optional[str] = None
-    token_type: Literal["bearer"] = "bearer"  # Ensures only "bearer" is allowed
+    def __str__(self):
+        return f"User {self.name} ({self.email})"

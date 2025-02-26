@@ -1,18 +1,20 @@
-from fastapi import FastAPI
+from fastapi import FastAPI # type: ignore
 from contextlib import asynccontextmanager
-from db.database import connect_db, close_db
 from core.config import get_settings
+from db.database import Base, engine
+from routes.auth_route import auth_router
+
 
 settings = get_settings()
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Set up MongoDB connection on startup and close it on shutdown."""
-    await connect_db()
-    try:
-        yield
-    finally:
-        await close_db()
+    async with engine.begin() as conn:
+        # create table if they don't exist
+        await conn.run_sync(Base.metadata.create_all)
+    yield # continue the app running
+
 
 app = FastAPI(
               title=settings.APP_NAME, 
@@ -20,6 +22,7 @@ app = FastAPI(
               description=settings.APP_DESCRIPTION,
               lifespan=lifespan
               )
+
 
 # Just Checking Routes
 @app.get("/", tags=['Index Page'])
@@ -33,4 +36,4 @@ async def read_about():
             "App Desciption":settings.APP_DESCRIPTION,
             "App Version": settings.APP_VERSION}
 
-# app.include_router(auth_route, prefix="/auth")
+app.include_router(auth_router, prefix="/auth", tags=["Authentication"])
